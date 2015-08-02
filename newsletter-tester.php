@@ -83,14 +83,13 @@ if (@$email && @$password && $content) {
 
     // Read an HTML message body from an external file, convert referenced images to embedded,
     // convert HTML into a basic plain-text alternative body
-
     if (@$content) {
 
-        $content = file_get_contents('newsletters/' . $content);
+        $contentHtml = file_get_contents('newsletters/' . $content . '/index.html');
 
         $dom = new Dom;
 
-        $dom->load($content);
+        $dom->load($contentHtml);
 
         $images = $dom->find('img');
 
@@ -98,11 +97,11 @@ if (@$email && @$password && $content) {
 
             $imageSrc = $image->getAttribute('src');
 
-            $mail->AddEmbeddedImage('newsletters/' . $imageSrc, slugify($imageSrc));
-            $content = str_replace($imageSrc, 'cid:' . slugify($imageSrc), $content);
+            $mail->AddEmbeddedImage('newsletters/' . $content .'/'. $imageSrc, slugify($imageSrc));
+            $contentHtml = str_replace($imageSrc, 'cid:' . slugify($imageSrc), $contentHtml);
         }
 
-        $mail->msgHTML($content, dirname(__FILE__));
+        $mail->msgHTML($contentHtml, dirname(__FILE__));
     }
 
     // Replace the plain text body with one created manually
