@@ -1,0 +1,12 @@
+{
+    "name": "vagrant/newsletter-tester",
+    "require": {
+        "paquettg/php-html-parser": "^1.6"
+    },
+    "authors": [
+        {
+            "name": "Syaiful Shah Zinan",
+            "email": "i.works@live.com"
+        }
+    ]
+}

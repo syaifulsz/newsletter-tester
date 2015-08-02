@@ -4,18 +4,30 @@
 //This should be done in your php.ini, but this is how to do it if you don't have access to that
 date_default_timezone_set('Etc/UTC');
 
+require 'vendor/autoload.php';
 require 'phpmailer/PHPMailerAutoload.php';
 
+use PHPHtmlParser\Dom;
+
 $output = null;
-
 $formData = $_GET;
-
 $email = (@$_GET['email'] ? $_GET['email'] : null);
 $password = (@$_GET['password'] ? $_GET['password'] : null);
 $send_to = (@$_GET['send_to'] ? $_GET['send_to'] : null);
 $content = (@$_GET['nt_index'] ? $_GET['nt_index'] : null);
 
-if (@$email && @$password) {
+function slugify($string)
+{
+    $slug = preg_replace('/[\s]+/', '-', $string);
+    $slug = str_replace('[-]+', '-', $slug);
+    $slug = preg_replace('/[^\da-z-]/i', '', $slug);
+    $slug = strtolower($slug);
+    $slug = trim($slug, '-');
+
+    return $slug;
+}
+
+if (@$email && @$password && $content) {
 
     // Create a new PHPMailer instance
     $mail = new PHPMailer;
@@ -71,7 +83,27 @@ if (@$email && @$password) {
 
     // Read an HTML message body from an external file, convert referenced images to embedded,
     // convert HTML into a basic plain-text alternative body
-    $mail->msgHTML(file_get_contents('newsletters/' . $content), dirname(__FILE__));
+
+    if (@$content) {
+
+        $content = file_get_contents('newsletters/' . $content);
+
+        $dom = new Dom;
+
+        $dom->load($content);
+
+        $images = $dom->find('img');
+
+        foreach ($images as $image) {
+
+            $imageSrc = $image->getAttribute('src');
+
+            $mail->AddEmbeddedImage('newsletters/' . $imageSrc, slugify($imageSrc));
+            $content = str_replace($imageSrc, 'cid:' . slugify($imageSrc), $content);
+        }
+
+        $mail->msgHTML($content, dirname(__FILE__));
+    }
 
     // Replace the plain text body with one created manually
     $mail->AltBody = 'Test with Newsletter Tester tool by Syaiful Shah Zinan';
