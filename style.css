@@ -6794,3 +6794,14 @@ body {
   margin-right: -15px;
   margin-bottom: 15px;
 }
+.nt-progress-bar {
+  position: absolute;
+  width: 100%;
+  top: 0;
+  left: 0;
+}
+.nt-progress-bar .progress {
+  margin-bottom: 0;
+  border-radius: 0;
+  height: 3px;
+}

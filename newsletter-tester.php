@@ -85,7 +85,9 @@ if (@$email && @$password && $content) {
     // convert HTML into a basic plain-text alternative body
     if (@$content) {
 
-        $contentHtml = file_get_contents('newsletters/' . $content . '/index.html');
+        $newslettersPath = 'newsletters/' . $content . '/';
+        $contentHtml = file_get_contents($newslettersPath . 'index.html');
+        $contentHtmlOriginal = $contentHtml;
 
         $dom = new Dom;
 
@@ -97,11 +99,13 @@ if (@$email && @$password && $content) {
 
             $imageSrc = $image->getAttribute('src');
 
-            $mail->AddEmbeddedImage('newsletters/' . $content .'/'. $imageSrc, slugify($imageSrc));
+            $mail->AddEmbeddedImage($newslettersPath . $imageSrc, slugify($imageSrc));
             $contentHtml = str_replace($imageSrc, 'cid:' . slugify($imageSrc), $contentHtml);
+            $contentHtmlOriginal = str_replace($imageSrc, $newslettersPath . $imageSrc, $contentHtmlOriginal);
         }
 
         $mail->msgHTML($contentHtml, dirname(__FILE__));
+        $output['content'] = $contentHtmlOriginal;
     }
 
     // Replace the plain text body with one created manually

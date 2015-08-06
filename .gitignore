@@ -1,4 +1,4 @@
 /node_modules/
 /.idea/
 /newsletters/*
-!/newsletters/index.html
+!/newsletters/sample
